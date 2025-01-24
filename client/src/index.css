@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-Regular.otf') format('otf');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-RegularItalic.otf') format('otf');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-Semibold.otf') format('otf');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-SemiboldItalic.otf') format('otf');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-Bold.otf') format('otf');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('./assets/fonts/SF-Pro-Display-BoldItalic.otf') format('otf');
+    font-weight: 600;
+    font-style: italic;
+}
