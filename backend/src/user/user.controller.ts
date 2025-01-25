@@ -1,51 +1,27 @@
-import {
-    BadRequestException,
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    Res,
-} from '@nestjs/common';
-import { createUserDto } from 'src/common/dto/createUserDto';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Response } from 'express';
+import { CreateUserDto } from './dto/createUser.dto';
+import { CreateUserRto } from './dto/createUser.rto';
 
 @Controller('user')
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
     @Post('create')
-    public async create(@Body() body: createUserDto, @Res() res: Response) {
-        const userIsCreated = await this.userService.create(
-            body.email,
-            body.password,
-        );
-        if (!userIsCreated) {
-            throw new BadRequestException('User is not created');
-        }
-        res.json('User created');
-        res.end();
+    public async create(@Body() body: CreateUserDto): Promise<CreateUserRto> {
+        const user = await this.userService.create(body.email, body.password);
+        return new CreateUserRto(user);
     }
 
     @Get()
     public async getAll() {
-        const users = this.userService.getAll();
-
-        if (!users) {
-            throw new BadRequestException('Users error');
-        }
+        const users = await this.userService.getAll();
         return users;
     }
 
     @Delete('/:id')
-    public async deleteById(@Param('id') id: string, @Res() res: Response) {
-        const userIsDeleted = await this.userService.deleteById(id);
-        if (!userIsDeleted) {
-            throw new BadRequestException('User is not deleted');
-        }
-        res.json('User deleted');
-        res.end();
+    public async deleteById(@Param('id') id: string) {
+        await this.userService.deleteById(id);
+        return 'User is deleted';
     }
 }
