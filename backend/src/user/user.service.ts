@@ -1,23 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async create(email: string, password: string): Promise<User> {
+    public async create(
+        email: string,
+        password: string,
+        activationLink: string,
+    ): Promise<User> {
         const emailIsExists = await this.getUserByEmail(email);
         if (emailIsExists) {
             throw new BadRequestException('Email is exists');
         }
-        const salt = process.env.PASSWORD_SALT ?? (await bcrypt.genSalt());
-        const hashPassword = await bcrypt.hash(password, salt);
         return await this.prisma.user.create({
             data: {
                 email,
-                password: hashPassword,
+                password,
+                activationLink,
             },
         });
     }
