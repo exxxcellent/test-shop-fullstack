@@ -1,19 +1,26 @@
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Post,
+    UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
+import { AuthGuard } from '@shared/guards';
 
 @Controller('user')
+@UseGuards(AuthGuard)
 export class UserController {
     constructor(private readonly userService: UserService) {}
-
     @Get()
-    public async getAll() {
-        const users = await this.userService.getAll();
+    public async getMany() {
+        const users = await this.userService.getMany();
         return users;
     }
-
     @Delete('/:id')
-    public async deleteById(@Param('id') id: string) {
-        await this.userService.deleteById(id);
-        return 'User is deleted';
+    public async deleteOneById(@Param('id') id: string) {
+        const user = await this.userService.deleteOneById(id);
+        return user;
     }
 }

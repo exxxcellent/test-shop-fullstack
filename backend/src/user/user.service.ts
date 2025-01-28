@@ -1,5 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { Message } from '@shared/enums';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -11,9 +12,9 @@ export class UserService {
         password: string,
         activationLink: string,
     ): Promise<User> {
-        const emailIsExists = await this.getUserByEmail(email);
+        const emailIsExists = await this.getOneByEmail(email);
         if (emailIsExists) {
-            throw new BadRequestException('Email is exists');
+            throw new BadRequestException(Message.EMAIL_IS_EXISTS);
         }
         return await this.prisma.user.create({
             data: {
@@ -24,11 +25,11 @@ export class UserService {
         });
     }
 
-    public async getAll(): Promise<User[]> {
+    public async getMany(): Promise<User[]> {
         return await this.prisma.user.findMany();
     }
 
-    public async getUserByEmail(email: string): Promise<User | null> {
+    public async getOneByEmail(email: string): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where: {
                 email,
@@ -36,7 +37,7 @@ export class UserService {
         });
     }
 
-    public async getUserById(id: string): Promise<User | null> {
+    public async getOneById(id: string): Promise<User | null> {
         return await this.prisma.user.findUnique({
             where: {
                 id,
@@ -44,16 +45,17 @@ export class UserService {
         });
     }
 
-    public async deleteById(id: string) {
-        const userIsExists = await this.getUserById(id);
-        if (!userIsExists) throw new BadRequestException('User does not exist');
-        const userIsDeleted = await this.prisma.user.delete({
+    public async deleteOneById(id: string) {
+        const userIsExists = await this.getOneById(id);
+        if (!userIsExists) throw new BadRequestException(Message.NOT_FOUND);
+        const user = await this.prisma.user.delete({
             where: {
                 id,
             },
         });
-        if (!userIsDeleted) {
-            throw new BadRequestException('User not deleted');
+        if (!user) {
+            throw new BadRequestException(Message.NOT_DELETED);
         }
+        return user;
     }
 }
