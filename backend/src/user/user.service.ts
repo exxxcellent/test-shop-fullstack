@@ -47,13 +47,14 @@ export class UserService {
     public async deleteById(id: string) {
         const userIsExists = await this.getUserById(id);
         if (!userIsExists) throw new BadRequestException('User does not exist');
-        const userIsDeleted = await this.prisma.user.delete({
+        const user = await this.prisma.user.delete({
             where: {
                 id,
             },
         });
-        if (!userIsDeleted) {
+        if (!user) {
             throw new BadRequestException('User not deleted');
         }
+        return user;
     }
 }
