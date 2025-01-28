@@ -40,11 +40,12 @@ export class AuthController {
     }
 
     @Get('activate/:link')
-    public async activate(@Param('link') link: string) {
+    public async activate(@Param('link') link: string, @Res() res: Response) {
         await this.authService.activate(
-            `${process.env.HOST}:${process.env.PORT}/auth/activate/${link}`,
+            `${process.env.HOST}/auth/activate/${link}`,
         );
-        return '<h1>Аккаунт активирован</h1>';
+        res.send('<h1>Аккаунт активирован</h1>');
+        res.end();
     }
 
     @Get('logout')

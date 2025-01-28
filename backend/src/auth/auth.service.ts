@@ -11,6 +11,7 @@ import { User } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UuidService } from 'nestjs-uuid';
+import { Message } from '@shared/enums';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
         const { accessToken, refreshToken } = this.tokenService.generateTokens({
             email,
         });
-        const activationLink = `${process.env.HOST}:${process.env.PORT}/auth/activate/${this.uuidService.generate({ version: 4 })}`;
+        const activationLink = `${process.env.HOST}/auth/activate/${this.uuidService.generate({ version: 4 })}`;
         const user = await this.userService.create(
             email,
             hashPassword,
@@ -58,11 +59,11 @@ export class AuthService {
             },
         });
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(Message.NOT_FOUND);
         }
         const isPasswordEquals = await bcrypt.compare(password, user.password);
         if (!isPasswordEquals) {
-            throw new BadRequestException('Wrong password');
+            throw new BadRequestException(Message.WRONG_PASSWORD);
         }
         const { accessToken, refreshToken } = this.tokenService.generateTokens({
             email,
@@ -80,17 +81,17 @@ export class AuthService {
 
     public async refresh(refreshToken: string) {
         if (!refreshToken) {
-            throw new UnauthorizedException('Access required');
+            throw new UnauthorizedException(Message.AUTH_REQUIRED);
         }
         const tokenIsValid =
             this.tokenService.validateRefreshToken(refreshToken);
         const tokenInDb = await this.tokenService.findToken(refreshToken);
         if (!tokenIsValid || !tokenInDb) {
-            throw new UnauthorizedException('Access required');
+            throw new UnauthorizedException(Message.AUTH_REQUIRED);
         }
-        const user = await this.userService.getUserById(tokenInDb.userId);
+        const user = await this.userService.getOneById(tokenInDb.userId);
         if (!user) {
-            throw new UnauthorizedException('Access required');
+            throw new UnauthorizedException(Message.AUTH_REQUIRED);
         }
         const tokens = this.tokenService.generateTokens({
             email: user.email,
@@ -109,7 +110,7 @@ export class AuthService {
             },
         });
         if (!user) {
-            throw new BadRequestException('Activation of the account failed');
+            throw new BadRequestException(Message.ACTIVATION_FAILED);
         }
         await this.prismaService.user.update({
             where: {

@@ -7,9 +7,25 @@ import { TokenModule } from './token/token.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { LoggerMiddleware } from '@shared/middlewares';
+import { JwtModule } from '@nestjs/jwt';
+import { ItemModule } from './item/item.module';
+import { CategoryModule } from './category/category.module';
+import { OrderModule } from './order/order.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
-    imports: [PrismaModule, UserModule, TokenModule, AuthModule, MailModule],
+    imports: [
+        PrismaModule,
+        UserModule,
+        TokenModule,
+        AuthModule,
+        MailModule,
+        JwtModule,
+        ItemModule,
+        CategoryModule,
+        OrderModule,
+        PaymentModule,
+    ],
     controllers: [AppController],
     providers: [AppService],
 })
