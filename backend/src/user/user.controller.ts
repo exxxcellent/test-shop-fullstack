@@ -1,26 +1,25 @@
-import {
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Post,
-    UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@shared/guards';
+import { User } from '@prisma/client';
 
 @Controller('user')
 @UseGuards(AuthGuard)
 export class UserController {
     constructor(private readonly userService: UserService) {}
-    @Get()
+
+    @Get('')
     public async getMany() {
-        const users = await this.userService.getMany();
-        return users;
+        return await this.userService.getMany();
     }
+
+    @Get('/:id')
+    public async getOneById(@Param('id') id: string): Promise<User> {
+        return await this.userService.getOneById(id);
+    }
+
     @Delete('/:id')
     public async deleteOneById(@Param('id') id: string) {
-        const user = await this.userService.deleteOneById(id);
-        return user;
+        return await this.userService.deleteOneById(id);
     }
 }

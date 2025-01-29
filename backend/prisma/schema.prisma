@@ -21,7 +21,7 @@ model User {
   role           UserRole @default(USER)
   isActivated    Boolean  @default(false)
   activationLink String
-  balance        Int?
+  balance        Int      @default(0)
   tokens         Token[]
   Order          Order[]
 }
@@ -43,26 +43,25 @@ model Item {
   title       String
   description String?
   price       Int
-  category    Category @relation(fields: [categoryId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   categoryId  String
-  amount      Int?
-  orderId     String?
+  amount      Int      @default(0)
   Order       Order[]
   imageUrl    String?
 }
 
 model Category {
-  id      String @id @default(uuid())
-  title   String
-  popular Int
-  item    Item[]
+  id         String @id @default(uuid())
+  title      String @unique
+  popularity Int    @default(0)
+  item       Item[]
 }
 
 model Order {
   id           String       @id @default(uuid())
   user         User         @relation(fields: [userId], references: [id])
   userId       String
-  item         Item         @relation(fields: [itemId], references: [id])
+  item         Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId       String
   deliveryType DeliveryType @default(AUTO)
   status       OrderStatus  @default(CREATED)

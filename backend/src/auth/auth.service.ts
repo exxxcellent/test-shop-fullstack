@@ -11,7 +11,7 @@ import { User } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UuidService } from 'nestjs-uuid';
-import { Message } from '@shared/enums';
+import { AuthError, EntityError } from '@shared/enums';
 
 @Injectable()
 export class AuthService {
@@ -59,11 +59,11 @@ export class AuthService {
             },
         });
         if (!user) {
-            throw new NotFoundException(Message.NOT_FOUND);
+            throw new NotFoundException(EntityError.NOT_FOUND);
         }
         const isPasswordEquals = await bcrypt.compare(password, user.password);
         if (!isPasswordEquals) {
-            throw new BadRequestException(Message.WRONG_PASSWORD);
+            throw new BadRequestException(AuthError.WRONG_PASSWORD);
         }
         const { accessToken, refreshToken } = this.tokenService.generateTokens({
             email,
@@ -81,17 +81,17 @@ export class AuthService {
 
     public async refresh(refreshToken: string) {
         if (!refreshToken) {
-            throw new UnauthorizedException(Message.AUTH_REQUIRED);
+            throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         }
         const tokenIsValid =
             this.tokenService.validateRefreshToken(refreshToken);
         const tokenInDb = await this.tokenService.findToken(refreshToken);
         if (!tokenIsValid || !tokenInDb) {
-            throw new UnauthorizedException(Message.AUTH_REQUIRED);
+            throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         }
         const user = await this.userService.getOneById(tokenInDb.userId);
         if (!user) {
-            throw new UnauthorizedException(Message.AUTH_REQUIRED);
+            throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         }
         const tokens = this.tokenService.generateTokens({
             email: user.email,
@@ -110,7 +110,7 @@ export class AuthService {
             },
         });
         if (!user) {
-            throw new BadRequestException(Message.ACTIVATION_FAILED);
+            throw new BadRequestException(AuthError.ACTIVATION_FAILED);
         }
         await this.prismaService.user.update({
             where: {
