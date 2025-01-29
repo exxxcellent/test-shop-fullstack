@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ItemModule } from 'src/item/item.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
                 from: `"Test Shop (Fullstack)" <${process.env.MAIL_USER}>`,
             },
         }),
+        ItemModule,
     ],
     providers: [MailService],
     exports: [MailService],

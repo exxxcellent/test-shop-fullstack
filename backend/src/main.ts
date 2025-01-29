@@ -1,6 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from '@shared/filters';
 import { TransformInterceptor } from '@shared/interceptors';
 import * as cookieParser from 'cookie-parser';
@@ -13,6 +13,7 @@ async function bootstrap() {
     app.useGlobalFilters(new HttpExceptionFilter());
     app.useGlobalInterceptors(new TransformInterceptor());
     app.use(cookieParser());
+    app.useGlobalPipes(new ValidationPipe());
     await app.listen(process.env.API_PORT ?? 3000);
 }
 bootstrap();

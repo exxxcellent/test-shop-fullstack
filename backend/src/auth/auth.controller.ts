@@ -13,10 +13,13 @@ export class AuthController {
 
     @Post('login')
     public async login(
-        @Body() { email, password }: LoginUserDto,
+        @Body() loginUserDto: LoginUserDto,
         @Res() res: Response,
     ) {
-        const user = await this.authService.login(email, password);
+        const user = await this.authService.login(
+            loginUserDto.email,
+            loginUserDto.password,
+        );
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
