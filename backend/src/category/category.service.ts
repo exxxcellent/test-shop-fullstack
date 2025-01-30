@@ -17,7 +17,7 @@ export class CategoryService {
         });
     }
 
-    public async getOneById(id: string): Promise<Category | null> {
+    public async getOneById(id: string): Promise<Category> {
         const category = await this.prismaService.category.findFirst({
             where: {
                 id,

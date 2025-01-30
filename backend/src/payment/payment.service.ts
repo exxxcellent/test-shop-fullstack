@@ -41,12 +41,12 @@ export class PaymentService {
         userId: string,
         balance: number,
         price: number,
-    ): Promise<User> {
+    ): Promise<boolean> {
         const balanceIsPayable = this.checkBalance(balance, price);
         if (!balanceIsPayable)
             throw new BadRequestException(OrderError.BALANCE_IS_LOW);
-        const updatedUser = await this.pay(userId, balance, price);
-        return updatedUser;
+        await this.pay(userId, balance, price);
+        return true;
     }
 
     public async fillBalance(userId: string, sum: number): Promise<User> {

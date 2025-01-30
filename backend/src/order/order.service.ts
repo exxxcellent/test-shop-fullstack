@@ -41,14 +41,12 @@ export class OrderService {
     }
 
     public async getManyOrdersByUserId(userId: string): Promise<Order[]> {
-        const user = await this.userService.getOneById(userId);
-        if (!user) throw new UnauthorizedException(EntityError.NOT_FOUND);
+        await this.userService.getOneById(userId);
         const orders = await this.prismaService.order.findMany({
             where: {
                 userId,
             },
         });
-        if (!orders.length) throw new NotFoundException(EntityError.NOT_FOUND);
         return orders;
     }
 
@@ -59,9 +57,7 @@ export class OrderService {
         status?: OrderStatus,
     ): Promise<Order> {
         const user = await this.userService.getOneById(userId);
-        if (!user) throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         const item = await this.itemService.getOneById(itemId);
-        if (!item) throw new NotFoundException(EntityError.NOT_FOUND);
         if (item.amount == 0)
             throw new BadRequestException(OrderError.AMOUNT_IS_NULL);
         const isPaid = await this.paymentService.buyItem(
@@ -74,7 +70,6 @@ export class OrderService {
             amount: item.amount - 1,
         });
         const category = await this.categoryService.getOneById(item.categoryId);
-        if (!category) throw new BadRequestException(EntityError.NOT_FOUND);
         await this.categoryService.updateOneById(category.id, {
             popularity: category.popularity + 1,
         });
@@ -93,14 +88,8 @@ export class OrderService {
         id: string,
         body: UpdateOrderDto,
     ): Promise<Order> {
-        const order = await this.prismaService.order.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (!order) throw new BadRequestException(EntityError.NOT_FOUND);
+        const order = await this.getOneOrderById(id);
         const user = await this.userService.getOneById(order.userId);
-        if (!user) throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         const updatedOrder = await this.prismaService.order.update({
             where: {
                 id,
