@@ -6,7 +6,11 @@ import { TransformInterceptor } from '@shared/interceptors';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+        cors: {
+            origin: `http://localhost:${process.env.CLIENT_PORT}`,
+        },
+    });
     app.useGlobalInterceptors(
         new ClassSerializerInterceptor(app.get(Reflector)),
     );

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { TokenService } from 'src/token/token.service';
 import { UserService } from 'src/user/user.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
 import { PrismaService } from 'src/prisma/prisma.service';

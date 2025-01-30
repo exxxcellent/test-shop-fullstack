@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
     Post,
@@ -53,5 +54,10 @@ export class OrderController {
         @Body() body: UpdateOrderDto,
     ) {
         return await this.orderService.updateOneById(id, body);
+    }
+
+    @Delete('/:id')
+    public async deleteOneById(@Param('id') id: string) {
+        return await this.orderService.deleteOneById(id);
     }
 }

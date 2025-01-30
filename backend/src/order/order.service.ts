@@ -108,4 +108,13 @@ export class OrderService {
         );
         return updatedOrder;
     }
+
+    public async deleteOneById(id: string) {
+        await this.getOneOrderById(id);
+        await this.prismaService.order.delete({
+            where: {
+                id,
+            },
+        });
+    }
 }

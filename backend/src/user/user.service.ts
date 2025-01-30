@@ -34,13 +34,12 @@ export class UserService {
         return await this.prisma.user.findMany();
     }
 
-    public async getOneByEmail(email: string): Promise<User> {
+    public async getOneByEmail(email: string): Promise<User | null> {
         const user = await this.prisma.user.findUnique({
             where: {
                 email,
             },
         });
-        if (!user) throw new NotFoundException(EntityError.NOT_FOUND);
         return user;
     }
 
