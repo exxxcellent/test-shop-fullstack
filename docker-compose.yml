@@ -1,0 +1,44 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PWD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: nestjs_app
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "${API_PORT}:3000"
+    command: ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+
+  frontend:
+    build: ./client
+    container_name: vite_react_app
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "${CLIENT_PORT}:8080"
+    command: ["npm", "run", "dev"]
+
+volumes:
+  pg_data:

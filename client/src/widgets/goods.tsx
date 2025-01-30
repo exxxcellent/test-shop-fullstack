@@ -3,12 +3,15 @@ import Good from '../shared/ui/good';
 
 export default function Goods() {
     const goods = useGoodStore((state) => state.goods);
+    const getItems = useGoodStore((state) => state.getGoods);
 
     return (
         <section
             id="goods"
             className="px-5">
-            <h1 className="text-2xl font-bold text-text-secondary mb-2">
+            <h1
+                className="text-2xl font-bold text-text-secondary mb-2"
+                onClick={getItems}>
                 Выберите товар
             </h1>
             <ul className="grid grid-cols-2 gap-2">
@@ -19,7 +22,6 @@ export default function Goods() {
                             good={good}
                         />
                     </li>
-                    
                 ))}
             </ul>
         </section>

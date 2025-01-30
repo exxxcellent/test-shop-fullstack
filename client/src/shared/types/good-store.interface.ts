@@ -4,4 +4,5 @@ export interface GoodStore {
     goods: Good[];
     selectedGood: Good | null;
     setSelectedGood: (good: Good | null) => void;
+    getGoods: () => void;
 }
