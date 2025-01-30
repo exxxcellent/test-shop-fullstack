@@ -38,6 +38,22 @@ export class MailService {
         });
     }
 
+    public async sendMailOrderCanceled(to: string, itemId: string) {
+        const { title } = await this.itemService.getOneById(itemId);
+        await this.mailerService.sendMail({
+            to,
+            subject: `Заказ для ${to} не оформлен (Не оплачено)`,
+            html: `
+                <h1>Заказ для ${to} не оформлен (Не оплачено).<h1>
+                </hr>
+                <b>Вы хотели заказать:</b>
+                <div>
+                    <h2>${title}<h2>
+                </div>
+            `,
+        });
+    }
+
     public async sendMailOrderUpdateStatus(
         to: string,
         itemId: string,

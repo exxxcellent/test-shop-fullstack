@@ -1,20 +1,15 @@
 import {
     BadRequestException,
     Injectable,
-    NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { AuthError, EntityError, OrderError } from '@shared/enums';
-import { ItemService } from 'src/item/item.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class PaymentService {
-    constructor(
-        private readonly userService: UserService,
-        private readonly itemService: ItemService,
-    ) {}
+    constructor(private readonly userService: UserService) {}
 
     private checkBalance(balance: number, price: number): boolean {
         if (balance < price) return false;
@@ -43,8 +38,7 @@ export class PaymentService {
         price: number,
     ): Promise<boolean> {
         const balanceIsPayable = this.checkBalance(balance, price);
-        if (!balanceIsPayable)
-            throw new BadRequestException(OrderError.BALANCE_IS_LOW);
+        if (!balanceIsPayable) return false;
         await this.pay(userId, balance, price);
         return true;
     }

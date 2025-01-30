@@ -65,7 +65,10 @@ export class OrderService {
             user.balance,
             item.price,
         );
-        if (!isPaid) throw new BadRequestException(OrderError.NOT_PAID);
+        if (!isPaid) {
+            await this.mailService.sendMailOrderCanceled(user.email, itemId);
+            throw new BadRequestException(OrderError.NOT_PAID);
+        }
         await this.itemService.updateOneById(item.id, {
             amount: item.amount - 1,
         });
