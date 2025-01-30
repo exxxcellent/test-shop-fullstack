@@ -55,22 +55,20 @@ export class UserService {
     }
 
     public async deleteOneById(id: string): Promise<User> {
-        const userIsExists = await this.getOneById(id);
-        if (!userIsExists) throw new BadRequestException(EntityError.NOT_FOUND);
-        const user = await this.prisma.user.delete({
+        await this.getOneById(id);
+        const deletedUser = await this.prisma.user.delete({
             where: {
                 id,
             },
         });
-        if (!user) {
+        if (!deletedUser) {
             throw new BadRequestException(EntityError.NOT_DELETED);
         }
-        return user;
+        return deletedUser;
     }
 
     public async updateOneById(id: string, body: UpdateUserDto): Promise<User> {
-        const user = await this.getOneById(id);
-        if (!user) throw new BadRequestException(EntityError.NOT_FOUND);
+        await this.getOneById(id);
         const updatedUser = await this.prisma.user.update({
             where: {
                 id,

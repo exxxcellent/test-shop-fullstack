@@ -46,14 +46,7 @@ export class ItemService {
     }
 
     public async updateOneById(id: string, body: UpdateItemDto): Promise<Item> {
-        const item = await this.prismaService.item.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (!item) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
-        }
+        await this.getOneById(id);
         return await this.prismaService.item.update({
             where: {
                 id,
@@ -65,14 +58,7 @@ export class ItemService {
     }
 
     public async deleteOneById(id: string): Promise<Item> {
-        const item = await this.prismaService.item.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (!item) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
-        }
+        await this.getOneById(id);
         return await this.prismaService.item.delete({
             where: {
                 id,

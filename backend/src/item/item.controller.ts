@@ -23,25 +23,28 @@ export class ItemController {
     }
 
     @Get('/:id')
-    public async getOneById(@Param('id') id: string) {
+    public async getOneById(@Param('id') id: string): Promise<Item> {
         return await this.itemService.getOneById(id);
     }
 
     @UseGuards(AuthGuard)
     @Post('')
-    public async create(@Body() body: CreateItemDto) {
+    public async create(@Body() body: CreateItemDto): Promise<Item> {
         return await this.itemService.create(body);
     }
 
     @UseGuards(AuthGuard)
     @Put('/:id')
-    public async update(@Param('id') id: string, @Body() body: UpdateItemDto) {
+    public async update(
+        @Param('id') id: string,
+        @Body() body: UpdateItemDto,
+    ): Promise<Item> {
         return await this.itemService.updateOneById(id, body);
     }
 
     @UseGuards(AuthGuard)
     @Delete('/:id')
-    public async deleteOneById(@Param('id') id: string) {
+    public async deleteOneById(@Param('id') id: string): Promise<Item> {
         return await this.itemService.deleteOneById(id);
     }
 }

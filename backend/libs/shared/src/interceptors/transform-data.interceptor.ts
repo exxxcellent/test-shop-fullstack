@@ -9,7 +9,6 @@ import { Observable, map } from 'rxjs';
 
 export class TransformedData<T> {
     success: boolean;
-
     data: T;
 }
 

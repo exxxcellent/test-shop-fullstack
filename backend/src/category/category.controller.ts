@@ -23,7 +23,7 @@ export class CategoryController {
     }
 
     @Get('/:id')
-    public async getOneById(@Param('id') id: string): Promise<Category | null> {
+    public async getOneById(@Param('id') id: string): Promise<Category> {
         return await this.categoryService.getOneById(id);
     }
 

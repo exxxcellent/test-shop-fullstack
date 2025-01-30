@@ -1,11 +1,6 @@
-import {
-    BadRequestException,
-    Injectable,
-    UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { Response } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

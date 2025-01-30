@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
-import { OrderStatusRu } from '@shared/enums/order-status-ru.enum';
+import { OrderStatusRu } from '@shared/enums';
 import { ItemService } from 'src/item/item.service';
 
 @Injectable()
