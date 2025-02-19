@@ -15,16 +15,16 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  password       String
-  createdAt      DateTime @default(now())
-  role           UserRole @default(USER)
-  isActivated    Boolean  @default(false)
-  activationLink String
-  balance        Int      @default(0)
-  tokens         Token[]
-  Order          Order[]
+  id        String    @id @default(uuid())
+  email     String    @unique
+  role      UserRole  @default(USER)
+  isLogin   Boolean   @default(false)
+  loginLink String
+  balance   Int       @default(0)
+  tokens    Token[]
+  order     Order[]
+  Balance   Balance[]
+  createdAt DateTime  @default(now())
 }
 
 model Token {
@@ -44,28 +44,37 @@ model Item {
   title       String
   description String?
   price       Int
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  categoryId  String
   amount      Int      @default(0)
-  Order       Order[]
+  order       Order[]
   imageUrl    String?
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  createdAt   DateTime @default(now())
 }
 
 model Category {
-  id         String @id @default(uuid())
-  title      String @unique
-  popularity Int    @default(0)
-  item       Item[]
+  id            String     @id @default(uuid())
+  title         String     @unique
+  parentId      String?
+  popularity    Int        @default(0)
+  parent        Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  subcategories Category[] @relation("CategoryToCategory")
+  item          Item[]
+  createdAt     DateTime   @default(now())
 }
 
 model Order {
   id           String       @id @default(uuid())
-  user         User         @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   item         Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId       String
   deliveryType DeliveryType @default(AUTO)
   status       OrderStatus  @default(CREATED)
+  sum          Int          @default(0)
+  address      String
+  message      String?
+  createdAt    DateTime     @default(now())
 }
 
 enum DeliveryType {
@@ -79,4 +88,27 @@ enum OrderStatus {
   DELIVERY
   COMPLETED
   CANCELED
+}
+
+model Balance {
+  id            String        @id @default(uuid())
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  sum           Int
+  status        BalanceStatus
+  paymentMethod PaymentMethod
+  createdAt     DateTime      @default(now())
+}
+
+enum BalanceStatus {
+  REFILL
+  PAID
+  RETURN
+}
+
+enum PaymentMethod {
+  SBP
+  YANDEX_PAY
+  VISA
+  OTHER
 }

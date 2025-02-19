@@ -12,11 +12,7 @@ import { UpdateUserDto } from './dto/update.dto';
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async create(
-        email: string,
-        password: string,
-        activationLink: string,
-    ): Promise<User> {
+    public async create(email: string, loginLink: string): Promise<User> {
         const user = await this.getOneByEmail(email);
         if (user) {
             throw new BadRequestException(AuthError.EMAIL_IS_EXISTS);
@@ -24,8 +20,7 @@ export class UserService {
         return await this.prisma.user.create({
             data: {
                 email,
-                password,
-                activationLink,
+                loginLink,
             },
         });
     }
@@ -43,7 +38,26 @@ export class UserService {
         return user;
     }
 
+    public async getOneByLoginLink(loginLink: string): Promise<User | null> {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                loginLink,
+            },
+        });
+        return user;
+    }
+
     public async getOneById(id: string): Promise<User> {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!user) throw new NotFoundException(EntityError.NOT_FOUND);
+        return user;
+    }
+
+    public async getOneByRefresh(id: string): Promise<User> {
         const user = await this.prisma.user.findUnique({
             where: {
                 id,

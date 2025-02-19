@@ -28,24 +28,25 @@ export class OrderController {
     public async getManyOrdersByUserId(
         @Param('userId') userId: string,
     ): Promise<Order[]> {
-        return await this.orderService.getManyOrdersByUserId(userId);
+        return await this.orderService.getManyByUserId(userId);
     }
 
     @Get('/:id')
     public async getOneOrderById(@Param('id') id: string): Promise<Order> {
-        return await this.orderService.getOneOrderById(id);
+        return await this.orderService.getOneById(id);
     }
 
     @Post('')
     public async create(
-        @Body() { userId, itemId, deliveryType, status }: CreateOrderDto,
+        @Body()
+        body: CreateOrderDto,
     ): Promise<Order> {
-        return await this.orderService.create(
-            userId,
-            itemId,
-            deliveryType,
-            status,
-        );
+        return await this.orderService.create(body);
+    }
+
+    @Post('/:id/pay')
+    public async payOrder(@Param('id') id: string): Promise<Order | null> {
+        return await this.orderService.payOrder(id);
     }
 
     @Put('/:id')

@@ -22,6 +22,13 @@ export class ItemController {
         return await this.itemService.getMany();
     }
 
+    @Get('/:categoryTitle/items')
+    public async getManyByCategoryTitle(
+        @Param('categoryTitle') categoryTitle: string,
+    ): Promise<Item[]> {
+        return await this.itemService.getManyByCategoryTitle(categoryTitle);
+    }
+
     @Get('/:id')
     public async getOneById(@Param('id') id: string): Promise<Item> {
         return await this.itemService.getOneById(id);

@@ -1,23 +1,24 @@
-import { useGoodStore } from '../store/useGoodStore';
-import Header from '../widgets/header';
-import Breadcrumb from '../widgets/breadcrumb';
-import Goods from '../widgets/goods';
-import GoodDrawer from '../shared/ui/good-drawer';
+import { PageLoader } from '@shared/ui';
+import delayForDemo from '@shared/utils/delay';
+import { Breadcrumb, Header } from '@widgets/general';
+import { lazy, Suspense } from 'react';
+
+const CategoriesChips = lazy(() =>
+    delayForDemo(import('../widgets/categories/ui/categories-chips'))
+);
+const ItemsCards = lazy(() =>
+    delayForDemo(import('../widgets/items/ui/items-cards'))
+);
 
 export default function CategoryPage() {
-    const selectedGood = useGoodStore((state) => state.selectedGood);
-    const setSelectedGood = useGoodStore((state) => state.setSelectedGood);
-
     return (
         <>
             <Header />
-            <Breadcrumb />
-            <Goods />
-            <GoodDrawer
-                good={selectedGood}
-                open={!!selectedGood}
-                onClose={() => setSelectedGood(null)}
-            />
+            <Suspense fallback={<PageLoader />}>
+                <Breadcrumb />
+                <CategoriesChips />
+                <ItemsCards />
+            </Suspense>
         </>
     );
 }

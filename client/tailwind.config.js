@@ -5,6 +5,7 @@ export default {
         extend: {
             fontFamily: {
                 'sf-pro': ['"SF Pro Display"', 'sans-serif'],
+                'ubuntu-mono': ['"Ubuntu Mono"', 'sans-serif'],
             },
             colors: {
                 accent: {
@@ -21,10 +22,15 @@ export default {
                     primary: '#782FEF',
                     secondary: '#333333',
                     tertiary: '#797979',
+                    placeholder: '#6D6D6D',
                     disabled: {
                         primary: '#C5A9FA',
                         secondary: '#999999',
                     },
+                },
+                error: {
+                    primary: '#EE3D48',
+                    secondary: '#FEF0F1',
                 },
             },
         },
