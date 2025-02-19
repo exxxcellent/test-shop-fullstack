@@ -1,7 +1,5 @@
 import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from './dto/create.dto';
-import { CreateUserRto } from './rto/create.rto';
 import { Request, Response } from 'express';
 import { LoginUserRto } from './rto/login.rto';
 import { LoginUserDto } from './dto/login.dto';
@@ -16,10 +14,7 @@ export class AuthController {
         @Body() loginUserDto: LoginUserDto,
         @Res() res: Response,
     ) {
-        const user = await this.authService.login(
-            loginUserDto.email,
-            loginUserDto.password,
-        );
+        const user = await this.authService.login(loginUserDto.email);
         res.cookie('refreshToken', user.refreshToken, {
             maxAge: 30 * 24 * 60 * 60 * 1000,
             httpOnly: true,
@@ -28,26 +23,14 @@ export class AuthController {
         res.end();
     }
 
-    @Post('register')
-    public async register(
-        @Body() { email, password }: CreateUserDto,
-        @Res() res: Response,
-    ) {
-        const user = await this.authService.register(email, password);
-        res.cookie('refreshToken', user.refreshToken, {
-            maxAge: 30 * 24 * 60 * 60 * 1000,
-            httpOnly: false,
-        });
-        res.json(new CreateUserRto(user));
-        res.end();
-    }
-
-    @Get('activate/:link')
+    @Get('login/:link')
     public async activate(@Param('link') link: string, @Res() res: Response) {
-        await this.authService.activate(
-            `${process.env.HOST}/auth/activate/${link}`,
+        const user = await this.authService.activate(
+            `${process.env.HOST}/auth/login/${link}`,
         );
-        res.send('<h1>Аккаунт активирован</h1>');
+        res.redirect(
+            `${process.env.CLIENT_HOST}/auth/login?id=${user.id}` as string,
+        );
         res.end();
     }
 

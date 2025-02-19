@@ -1,16 +1,35 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemDto } from './dto/create.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Item } from '@prisma/client';
 import { UpdateItemDto } from './dto/update.dto';
 import { EntityError } from '@shared/enums';
+import { CategoryService } from 'src/category/category.service';
 
 @Injectable()
 export class ItemService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly categoryService: CategoryService,
+    ) {}
 
     public async getMany(): Promise<Item[]> {
         return await this.prismaService.item.findMany();
+    }
+
+    public async getManyByCategoryTitle(
+        categoryTitle: string,
+    ): Promise<Item[]> {
+        const category =
+            await this.categoryService.getOneByTitle(categoryTitle);
+        if (!category) {
+            throw new NotFoundException(EntityError.NOT_FOUND);
+        }
+        return await this.prismaService.item.findMany({
+            where: {
+                categoryId: category.id,
+            },
+        });
     }
 
     public async getOneById(id: string): Promise<Item> {
@@ -20,7 +39,7 @@ export class ItemService {
             },
         });
         if (!item) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
+            throw new NotFoundException(EntityError.NOT_FOUND);
         }
         return item;
     }
@@ -63,6 +82,20 @@ export class ItemService {
             where: {
                 id,
             },
+        });
+    }
+
+    public async decreaseAmount(id: string) {
+        const item = await this.getOneById(id);
+        await this.updateOneById(id, {
+            amount: item.amount - 1,
+        });
+    }
+
+    public async increaseAmount(id: string) {
+        const item = await this.getOneById(id);
+        await this.updateOneById(id, {
+            amount: item.amount + 1,
         });
     }
 }

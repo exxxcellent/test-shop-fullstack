@@ -5,6 +5,10 @@ export class CreateCategoryDto {
     title: string;
 
     @IsOptional()
+    @IsString()
+    parentId: string;
+
+    @IsOptional()
     @IsNumber()
-    popularity: number;
+    popularity?: number;
 }

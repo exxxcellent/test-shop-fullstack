@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import { EntityError } from '@shared/enums';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -58,10 +59,12 @@ export class TokenService {
     }
 
     public async findToken(refreshToken: string) {
-        return await this.prismaService.token.findFirst({
+        const token = await this.prismaService.token.findFirst({
             where: {
                 refreshToken,
             },
         });
+        if (!token) throw new NotFoundException(EntityError.NOT_FOUND);
+        return token;
     }
 }

@@ -6,10 +6,8 @@ import {
 } from '@nestjs/common';
 import { TokenService } from 'src/token/token.service';
 import { UserService } from 'src/user/user.service';
-import * as bcrypt from 'bcryptjs';
 import { User } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { UuidService } from 'nestjs-uuid';
 import { AuthError, EntityError } from '@shared/enums';
 
@@ -19,32 +17,39 @@ export class AuthService {
         private readonly userService: UserService,
         private readonly tokenService: TokenService,
         private readonly mailService: MailService,
-        private readonly prismaService: PrismaService,
         private readonly uuidService: UuidService,
     ) {}
 
-    public async register(
+    private async generateLoginLink(): Promise<string> {
+        return `${process.env.HOST}/auth/login/${this.uuidService.generate({ version: 4 })}`;
+    }
+
+    private async generateTokens(
         email: string,
-        password: string,
+        userId: string,
     ): Promise<{
+        accessToken: string;
+        refreshToken: string;
+    }> {
+        const { accessToken, refreshToken } = this.tokenService.generateTokens({
+            email,
+        });
+        await this.tokenService.saveToken(userId, refreshToken);
+        return { accessToken, refreshToken };
+    }
+
+    public async register(email: string): Promise<{
         user: User;
         accessToken: string;
         refreshToken: string;
     }> {
-        const salt =
-            Number(process.env.PASSWORD_SALT) ?? (await bcrypt.genSalt());
-        const hashPassword = await bcrypt.hash(password, salt);
-        const { accessToken, refreshToken } = this.tokenService.generateTokens({
+        const loginLink = await this.generateLoginLink();
+        const user = await this.userService.create(email, loginLink);
+        const { accessToken, refreshToken } = await this.generateTokens(
             email,
-        });
-        const activationLink = `${process.env.HOST}/auth/activate/${this.uuidService.generate({ version: 4 })}`;
-        const user = await this.userService.create(
-            email,
-            hashPassword,
-            activationLink,
+            user.id,
         );
-        await this.tokenService.saveToken(user.id, refreshToken);
-        await this.mailService.sendActivationLink(email, activationLink);
+        await this.mailService.sendLoginLink(email, loginLink);
         return {
             user,
             accessToken,
@@ -52,31 +57,52 @@ export class AuthService {
         };
     }
 
-    public async login(email: string, password: string) {
-        const user = await this.prismaService.user.findFirst({
-            where: {
-                email,
-            },
-        });
+    public async login(email: string) {
+        const user = await this.userService.getOneByEmail(email);
         if (!user) {
-            throw new NotFoundException(EntityError.NOT_FOUND);
+            const registeredUser = await this.register(email);
+            return registeredUser;
         }
-        const isPasswordEquals = await bcrypt.compare(password, user.password);
-        if (!isPasswordEquals) {
-            throw new BadRequestException(AuthError.WRONG_PASSWORD);
-        }
-        const { accessToken, refreshToken } = this.tokenService.generateTokens({
+        const { accessToken, refreshToken } = await this.generateTokens(
             email,
+            user.id,
+        );
+        if (user.loginLink) {
+            await this.mailService.sendLoginLink(email, user.loginLink);
+            return {
+                user,
+                accessToken,
+                refreshToken,
+            };
+        }
+        if (user.isLogin) {
+            return {
+                user,
+                accessToken,
+                refreshToken,
+            };
+        }
+        const loginLink = await this.generateLoginLink();
+        const updatedUser = await this.userService.updateOneById(user.id, {
+            loginLink,
         });
-        await this.tokenService.saveToken(user.id, refreshToken);
+        await this.mailService.sendLoginLink(email, loginLink);
         return {
+            user: updatedUser,
             accessToken,
             refreshToken,
         };
     }
 
     public async logout(refreshToken: string) {
+        const token = await this.tokenService.findToken(refreshToken);
+        if (!token) throw new NotFoundException(EntityError.NOT_FOUND);
         await this.tokenService.deleteToken(refreshToken);
+        const user = await this.userService.getOneById(token.userId);
+        const loginLink = await this.generateLoginLink();
+        await this.userService.updateOneById(user.id, {
+            loginLink,
+        });
     }
 
     public async refresh(refreshToken: string) {
@@ -87,39 +113,28 @@ export class AuthService {
             this.tokenService.validateRefreshToken(refreshToken);
         const tokenInDb = await this.tokenService.findToken(refreshToken);
         if (!tokenIsValid || !tokenInDb) {
-            throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
+            throw new UnauthorizedException(AuthError.ACTIVATION_FAILED);
         }
         const user = await this.userService.getOneById(tokenInDb.userId);
         if (!user) {
             throw new UnauthorizedException(AuthError.AUTH_REQUIRED);
         }
-        const tokens = this.tokenService.generateTokens({
-            email: user.email,
-        });
-        await this.tokenService.saveToken(user.id, refreshToken);
+        const tokens = await this.generateTokens(user.email, user.id);
         return {
             user,
             ...tokens,
         };
     }
 
-    public async activate(activationLink: string) {
-        const user = await this.prismaService.user.findFirst({
-            where: {
-                activationLink,
-            },
-        });
+    public async activate(loginLink: string): Promise<User> {
+        const user = await this.userService.getOneByLoginLink(loginLink);
         if (!user) {
             throw new BadRequestException(AuthError.ACTIVATION_FAILED);
         }
-        await this.prismaService.user.update({
-            where: {
-                id: user.id,
-            },
-            data: {
-                isActivated: true,
-                activationLink: '',
-            },
+        await this.userService.updateOneById(user.id, {
+            loginLink: '',
+            isLogin: true,
         });
+        return user;
     }
 }

@@ -11,44 +11,60 @@ export class MailService {
         private readonly itemService: ItemService,
     ) {}
 
-    public async sendActivationLink(to: string, link: string) {
+    public async sendLoginLink(to: string, link: string) {
         await this.mailerService.sendMail({
             to,
-            subject: `Активация аккаунта на ${process.env.HOST}`,
+            subject: `Перейдите по ссылке и войдите в аккаунт`,
             html: `
-                <h1>Перейдите по ссылке ниже, чтобы активировать аккаунт<h1>
-                <a href="${link}">Активировать</a>
+                <h1>Перейдите по ссылке и войдите в аккаунт/<h1>
+                <a href="${link}">Войти</a>
             `,
         });
     }
 
     public async sendMailOrderCreated(to: string, itemId: string) {
-        const { title } = await this.itemService.getOneById(itemId);
+        const { title, id } = await this.itemService.getOneById(itemId);
         await this.mailerService.sendMail({
             to,
-            subject: `Заказ для ${to} создан`,
+            subject: `Заказ №${id} оформлен, ждет оплаты`,
             html: `
-                <h1>Заказ для ${to} успешно создан.<h1>
+                <h1>Заказ №${id} оформлен, ждет оплаты</h1>
                 </hr>
                 <b>Вы заказали:</b>
                 <div>
-                    <h2>${title}<h2>
+                    <h2>${title}</h2>
                 </div>
             `,
         });
     }
 
-    public async sendMailOrderCanceled(to: string, itemId: string) {
+    public async sendMailErrorItemAmount(to: string, itemId: string) {
         const { title } = await this.itemService.getOneById(itemId);
         await this.mailerService.sendMail({
             to,
-            subject: `Заказ для ${to} не оформлен (Не оплачено)`,
+            subject: `Заказ не оформлен, товар закончился`,
             html: `
-                <h1>Заказ для ${to} не оформлен (Не оплачено).<h1>
+                <h1>Заказ не оформлен, товар закончился</h1>
                 </hr>
                 <b>Вы хотели заказать:</b>
                 <div>
-                    <h2>${title}<h2>
+                    <h2>${title}</h2>
+                </div>
+            `,
+        });
+    }
+
+    public async sendMailErrorBalance(to: string, itemId: string) {
+        const { title } = await this.itemService.getOneById(itemId);
+        await this.mailerService.sendMail({
+            to,
+            subject: `Заказ не оплачен, на балансе не хватает средств`,
+            html: `
+                <h1>Заказ не оплачен, на балансе не хватает средств</h1>
+                </hr>
+                <b>Вы хотели заказать:</b>
+                <div>
+                    <h2>${title}</h2>
                 </div>
             `,
         });
@@ -63,13 +79,13 @@ export class MailService {
         const statusRu = OrderStatusRu[status];
         await this.mailerService.sendMail({
             to,
-            subject: `Статус вашего заказа изменился (${statusRu})`,
+            subject: `Ваш заказ ${statusRu}`,
             html: `
-                <h1>Статус вашего заказа изменился <span style="text-transform: capitalize;">(${statusRu})</span>.<h1>
+                <h1>Ваш заказ ${statusRu}</h1>
                 </hr>
                 <b>Ваш заказ:</b>
                 <div>
-                    <h2>${title}<h2>
+                    <h2>${title}</h2>
                 </div>
             `,
         });

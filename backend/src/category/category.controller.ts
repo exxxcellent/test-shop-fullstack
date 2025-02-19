@@ -27,6 +27,13 @@ export class CategoryController {
         return await this.categoryService.getOneById(id);
     }
 
+    @Get('/:title/categories')
+    public async getSubcategoriesByTitle(
+        @Param('title') title: string,
+    ): Promise<Category[]> {
+        return await this.categoryService.getSubcategoriesByTitle(title);
+    }
+
     @UseGuards(AuthGuard)
     @Post('')
     public async create(@Body() body: CreateCategoryDto): Promise<Category> {

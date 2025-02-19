@@ -1,6 +1,16 @@
-import { IsEmail, IsNumber, IsOptional } from 'class-validator';
+import {
+    IsBoolean,
+    IsEmail,
+    IsNumber,
+    IsOptional,
+    IsString,
+} from 'class-validator';
 
 export class UpdateUserDto {
+    @IsOptional()
+    @IsBoolean()
+    isLogin?: boolean;
+
     @IsOptional()
     @IsEmail()
     email?: string;
@@ -8,4 +18,8 @@ export class UpdateUserDto {
     @IsOptional()
     @IsNumber()
     balance?: number;
+
+    @IsOptional()
+    @IsString()
+    loginLink?: string;
 }

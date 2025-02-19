@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create.dto';
 import { Category } from '@prisma/client';
@@ -11,8 +15,34 @@ export class CategoryService {
 
     public async getMany(): Promise<Category[]> {
         return await this.prismaService.category.findMany({
+            where: {
+                parentId: null,
+            },
             orderBy: {
                 popularity: 'desc',
+            },
+        });
+    }
+
+    public async getOneByTitle(title: string): Promise<Category> {
+        const category = await this.prismaService.category.findFirst({
+            where: {
+                title,
+            },
+        });
+        if (!category) throw new NotFoundException(EntityError.NOT_FOUND);
+        await this.increasePopularity(category.id, category.popularity);
+        return category;
+    }
+
+    public async getSubcategoriesByTitle(title: string) {
+        await this.getOneByTitle(title);
+        return await this.prismaService.category.findMany({
+            where: {
+                title,
+            },
+            include: {
+                subcategories: true,
             },
         });
     }
@@ -23,23 +53,14 @@ export class CategoryService {
                 id,
             },
         });
-        if (!category) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
-        }
-        await this.prismaService.category.update({
-            where: {
-                id,
-            },
-            data: {
-                popularity: category.popularity + 1,
-            },
-        });
+        if (!category) throw new NotFoundException(EntityError.NOT_FOUND);
         return category;
     }
 
     public async create({
         title,
         popularity,
+        parentId,
     }: CreateCategoryDto): Promise<Category> {
         const category = await this.prismaService.category.findUnique({
             where: {
@@ -53,6 +74,7 @@ export class CategoryService {
             data: {
                 title,
                 popularity,
+                parentId,
             },
         });
     }
@@ -61,14 +83,7 @@ export class CategoryService {
         id: string,
         body: UpdateCategoryDto,
     ): Promise<Category> {
-        const category = await this.prismaService.category.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (!category) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
-        }
+        await this.getOneById(id);
         return await this.prismaService.category.update({
             where: {
                 id,
@@ -80,18 +95,15 @@ export class CategoryService {
     }
 
     public async deleteOneById(id: string): Promise<Category> {
-        const category = await this.prismaService.category.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (!category) {
-            throw new BadRequestException(EntityError.NOT_FOUND);
-        }
+        await this.getOneById(id);
         return await this.prismaService.category.delete({
             where: {
                 id,
             },
         });
+    }
+
+    public async increasePopularity(id: string, popularity: number) {
+        await this.updateOneById(id, { popularity: popularity + 1 });
     }
 }

@@ -1,8 +1,7 @@
-import { Exclude } from 'class-transformer';
+import { User } from '@prisma/client';
 
 export class LoginUserRto {
-    @Exclude()
-    password: string;
+    user: User;
 
     refreshToken: string;
     accessToken: string;
