@@ -1,12 +1,13 @@
 import {
     BadRequestException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
     UnauthorizedException,
 } from '@nestjs/common';
 import { TokenService } from 'src/token/token.service';
 import { UserService } from 'src/user/user.service';
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { MailService } from 'src/mail/mail.service';
 import { UuidService } from 'nestjs-uuid';
 import { AuthError, EntityError } from '@shared/enums';
@@ -20,8 +21,10 @@ export class AuthService {
         private readonly uuidService: UuidService,
     ) {}
 
-    private async generateLoginLink(): Promise<string> {
-        return `${process.env.HOST}/auth/login/${this.uuidService.generate({ version: 4 })}`;
+    private async generateLoginLink(
+        baseUrl: string = process.env.HOST as string,
+    ): Promise<string> {
+        return `${baseUrl}/auth/login/${this.uuidService.generate({ version: 4 })}`;
     }
 
     private async generateTokens(
@@ -50,6 +53,22 @@ export class AuthService {
             user.id,
         );
         await this.mailService.sendLoginLink(email, loginLink);
+        return {
+            user,
+            accessToken,
+            refreshToken,
+        };
+    }
+
+    public async adminLogin(email: string) {
+        const user = await this.userService.getOneByEmail(email);
+        if (!user) throw new BadRequestException(EntityError.NOT_FOUND);
+        if (user.role != UserRole.ADMIN)
+            throw new ForbiddenException(AuthError.IS_NOT_ADMIN);
+        const { accessToken, refreshToken } = await this.generateTokens(
+            email,
+            user.id,
+        );
         return {
             user,
             accessToken,
@@ -94,6 +113,17 @@ export class AuthService {
         };
     }
 
+    public async adminLogout(refreshToken: string) {
+        const token = await this.tokenService.findToken(refreshToken);
+        if (!token) throw new NotFoundException(EntityError.NOT_FOUND);
+        await this.tokenService.deleteToken(refreshToken);
+        const user = await this.userService.getOneById(token.userId);
+        await this.userService.updateOneById(user.id, {
+            loginLink: '',
+            isLogin: false,
+        });
+    }
+
     public async logout(refreshToken: string) {
         const token = await this.tokenService.findToken(refreshToken);
         if (!token) throw new NotFoundException(EntityError.NOT_FOUND);
@@ -132,7 +162,7 @@ export class AuthService {
             throw new BadRequestException(AuthError.ACTIVATION_FAILED);
         }
         await this.userService.updateOneById(user.id, {
-            loginLink: '',
+            loginLink: null,
             isLogin: true,
         });
         return user;

@@ -5,12 +5,16 @@ import { Item } from '@prisma/client';
 import { UpdateItemDto } from './dto/update.dto';
 import { EntityError } from '@shared/enums';
 import { CategoryService } from 'src/category/category.service';
+import { UuidService } from 'nestjs-uuid';
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class ItemService {
     constructor(
         private readonly prismaService: PrismaService,
         private readonly categoryService: CategoryService,
+        private readonly uuidService: UuidService,
+        private readonly fileService: FilesService,
     ) {}
 
     public async getMany(): Promise<Item[]> {
@@ -44,22 +48,17 @@ export class ItemService {
         return item;
     }
 
-    public async create({
-        title,
-        description,
-        price,
-        amount,
-        categoryId,
-        imageUrl,
-    }: CreateItemDto): Promise<Item> {
+    public async create(
+        body: CreateItemDto,
+        file: Express.Multer.File,
+    ): Promise<Item> {
+        const imageKey = `${process.env.S3_FOLDER}/${this.uuidService.generate({ version: 4 })}_${file.originalname}`;
+        const url = await this.fileService.upload(imageKey, file);
         return await this.prismaService.item.create({
             data: {
-                title,
-                description,
-                price,
-                amount,
-                categoryId,
-                imageUrl,
+                ...body,
+                price: +body.price,
+                imageUrl: url,
             },
         });
     }

@@ -22,6 +22,17 @@ export class MailService {
         });
     }
 
+    public async sendAdminLoginLink(to: string, link: string) {
+        await this.mailerService.sendMail({
+            to,
+            subject: `Перейдите по ссылке и войдите в аккаунт`,
+            html: `
+                <h1>Перейдите по ссылке и войдите в аккаунт/<h1>
+                <a href="${link}">Войти</a>
+            `,
+        });
+    }
+
     public async sendMailOrderCreated(to: string, itemId: string) {
         const { title, id } = await this.itemService.getOneById(itemId);
         await this.mailerService.sendMail({

@@ -12,6 +12,7 @@ import { ItemModule } from './item/item.module';
 import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
+import { FilesService } from './files/files.service';
 
 @Module({
     imports: [
@@ -27,7 +28,7 @@ import { PaymentModule } from './payment/payment.module';
         PaymentModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [AppService, FilesService],
 })
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {

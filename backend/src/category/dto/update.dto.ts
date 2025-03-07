@@ -6,6 +6,10 @@ export class UpdateCategoryDto {
     title?: string;
 
     @IsOptional()
+    @IsString()
+    parentId?: string | null;
+
+    @IsOptional()
     @IsNumber()
     popularity?: number;
 }

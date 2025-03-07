@@ -111,6 +111,10 @@ export class PaymentService {
         });
     }
 
+    public async getMany(): Promise<Balance[]> {
+        return await this.prismaService.balance.findMany();
+    }
+
     public async returnMoney(userId: string, sum: number) {
         const user = await this.userService.getOneById(userId);
         await this.userService.updateOneById(userId, {

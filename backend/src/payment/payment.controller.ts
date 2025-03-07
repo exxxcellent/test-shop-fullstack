@@ -13,7 +13,7 @@ import { Balance, User } from '@prisma/client';
 import { CreatePaymentDto } from './dto/create.dto';
 
 @Controller('payment')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
@@ -22,6 +22,11 @@ export class PaymentController {
         @Param('userId') userId: string,
     ): Promise<Balance[]> {
         return await this.paymentService.getManyByUserId(userId);
+    }
+
+    @Get('')
+    public async getMany(): Promise<Balance[]> {
+        return await this.paymentService.getMany();
     }
 
     @Post('/:userId')

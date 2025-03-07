@@ -29,7 +29,11 @@ export default function ItemCard({ item }: ItemCardProps) {
             to={`/category/${params.category}/product/${item.id}`}
             className="flex flex-col gap-2 justify-center bg-gray-secondary p-[9px] rounded-[20px] hover:bg-accent-primary/10 duration-150">
             <div className="min-h-40 min-w-40 h-full w-full bg-gray-primary rounded-[11px] self-center">
-                {/* image */}
+                <img
+                    className="rounded-[11px]"
+                    src={item.imageUrl ? item.imageUrl : ''}
+                    alt={item.title}
+                />
             </div>
             <div>
                 <h2 className="text-xl font-semibold text-text-secondary">

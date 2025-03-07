@@ -8,12 +8,12 @@ import {
 
 export class UpdateUserDto {
     @IsOptional()
-    @IsBoolean()
-    isLogin?: boolean;
-
-    @IsOptional()
     @IsEmail()
     email?: string;
+
+    @IsOptional()
+    @IsBoolean()
+    isLogin?: boolean;
 
     @IsOptional()
     @IsNumber()
@@ -21,5 +21,9 @@ export class UpdateUserDto {
 
     @IsOptional()
     @IsString()
-    loginLink?: string;
+    loginLink?: string | null;
+
+    @IsOptional()
+    @IsBoolean()
+    isActivated?: boolean;
 }

@@ -1,0 +1,12 @@
+{
+    "rules": {
+        "semi": "error",
+        "camelcase": "error",
+        "no-duplicate-imports": "error",
+        "no-unused-vars": "warn",
+        "no-console": "warn",
+        "no-var": "error",
+        "prefer-const": "warn",
+        "require-await": "error"
+    }
+}

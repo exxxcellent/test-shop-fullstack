@@ -6,13 +6,16 @@ import {
     Param,
     Post,
     Put,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create.dto';
 import { AuthGuard } from '@shared/guards';
 import { Item } from '@prisma/client';
 import { UpdateItemDto } from './dto/update.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('item')
 export class ItemController {
@@ -36,8 +39,12 @@ export class ItemController {
 
     @UseGuards(AuthGuard)
     @Post('')
-    public async create(@Body() body: CreateItemDto): Promise<Item> {
-        return await this.itemService.create(body);
+    @UseInterceptors(FileInterceptor('image'))
+    public async create(
+        @Body() body: any,
+        @UploadedFile() image: Express.Multer.File,
+    ): Promise<Item> {
+        return await this.itemService.create(body, image);
     }
 
     @UseGuards(AuthGuard)

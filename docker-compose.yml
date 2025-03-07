@@ -40,5 +40,17 @@ services:
       - "${CLIENT_PORT}:8080"
     command: ["npm", "run", "dev"]
 
+  admin:
+    build: ./admin
+    container_name: admin
+    restart: always
+    depends_on:
+      - backend
+      - postgres
+    env_file: .env
+    ports:
+      - "${ADMIN_PORT}:4000"
+    command: ["npm", "run", "dev"]
+
 volumes:
   pg_data:

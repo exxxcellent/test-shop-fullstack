@@ -12,7 +12,10 @@ import { UpdateUserDto } from './dto/update.dto';
 export class UserService {
     constructor(private readonly prisma: PrismaService) {}
 
-    public async create(email: string, loginLink: string): Promise<User> {
+    public async create(
+        email: string,
+        loginLink: string | null,
+    ): Promise<User> {
         const user = await this.getOneByEmail(email);
         if (user) {
             throw new BadRequestException(AuthError.EMAIL_IS_EXISTS);

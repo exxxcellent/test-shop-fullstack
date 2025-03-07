@@ -19,12 +19,13 @@ model User {
   email     String    @unique
   role      UserRole  @default(USER)
   isLogin   Boolean   @default(false)
-  loginLink String
+  loginLink String?
   balance   Int       @default(0)
   tokens    Token[]
   order     Order[]
   Balance   Balance[]
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Token {
@@ -50,6 +51,7 @@ model Item {
   category    Category @relation(fields: [categoryId], references: [id])
   categoryId  String
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Category {
@@ -61,6 +63,7 @@ model Category {
   subcategories Category[] @relation("CategoryToCategory")
   item          Item[]
   createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Order {
@@ -75,6 +78,7 @@ model Order {
   address      String
   message      String?
   createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 enum DeliveryType {
@@ -98,6 +102,7 @@ model Balance {
   status        BalanceStatus
   paymentMethod PaymentMethod
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 enum BalanceStatus {

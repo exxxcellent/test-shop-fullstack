@@ -15,7 +15,7 @@ import { Order } from '@prisma/client';
 import { UpdateOrderDto } from './dto/update.dto';
 
 @Controller('order')
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 export class OrderController {
     constructor(private readonly orderService: OrderService) {}
 
