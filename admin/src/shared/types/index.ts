@@ -1,8 +1,5 @@
 import type { ApiResponse } from './api/api-response.interface';
-import type {
-    AuthResponseLogin,
-    AuthResponseRegister,
-} from './api/auth-response.interface';
+import type { AuthResponseLogin } from './api/auth-response.interface';
 import { Prop } from './types/prop.interface';
 import { Field } from './types/field.interface';
 
@@ -16,7 +13,6 @@ import { REQUEST_METHOD } from './enums/request-method.enum';
 export {
     ApiResponse,
     AuthResponseLogin,
-    AuthResponseRegister,
     BalancePaymentMethod,
     BalanceStatus,
     DeliveryType,
