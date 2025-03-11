@@ -34,13 +34,13 @@ export class CategoryController {
         return await this.categoryService.getSubcategoriesByTitle(title);
     }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Post('')
     public async create(@Body() body: CreateCategoryDto): Promise<Category> {
         return await this.categoryService.create(body);
     }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Put('/:id')
     public async updateOneById(
         @Param('id') id: string,
@@ -49,7 +49,7 @@ export class CategoryController {
         return await this.categoryService.updateOneById(id, body);
     }
 
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
     @Delete('/:id')
     public async deleteOneById(@Param('id') id: string): Promise<Category> {
         return await this.categoryService.deleteOneById(id);

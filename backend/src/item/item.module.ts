@@ -4,11 +4,13 @@ import { ItemService } from './item.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { TokenModule } from 'src/token/token.module';
 import { CategoryModule } from 'src/category/category.module';
+import { FilesService } from 'src/files/files.service';
+import { UuidModule } from 'nestjs-uuid';
 
 @Module({
-    imports: [PrismaModule, TokenModule, CategoryModule],
+    imports: [PrismaModule, TokenModule, CategoryModule, UuidModule],
     controllers: [ItemController],
-    providers: [ItemService],
+    providers: [ItemService, FilesService],
     exports: [ItemService],
 })
 export class ItemModule {}

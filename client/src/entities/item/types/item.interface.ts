@@ -5,5 +5,5 @@ export interface Item {
     price: number;
     categoryId: string;
     amount: number;
-    imageUrl?: string;
+    imageUrl: string | null;
 }

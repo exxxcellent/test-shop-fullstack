@@ -21,6 +21,13 @@ export class CategoryService {
             orderBy: {
                 popularity: 'desc',
             },
+            include: {
+                _count: {
+                    select: {
+                        subcategories: true,
+                    },
+                },
+            },
         });
     }
 
@@ -51,6 +58,13 @@ export class CategoryService {
         const category = await this.prismaService.category.findFirst({
             where: {
                 id,
+            },
+            include: {
+                _count: {
+                    select: {
+                        subcategories: true,
+                    },
+                },
             },
         });
         if (!category) throw new NotFoundException(EntityError.NOT_FOUND);
@@ -84,6 +98,7 @@ export class CategoryService {
         body: UpdateCategoryDto,
     ): Promise<Category> {
         await this.getOneById(id);
+        if (body.parentId) await this.getOneById(body.parentId);
         return await this.prismaService.category.update({
             where: {
                 id,

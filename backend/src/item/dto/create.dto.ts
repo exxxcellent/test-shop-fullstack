@@ -1,24 +1,23 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateItemDto {
     @IsString()
     title: string;
 
-    @IsOptional()
     @IsString()
-    description: string | null;
+    categoryId: string;
 
+    @Transform(({ value }) => +value)
     @IsNumber()
     price: number;
 
     @IsOptional()
+    @IsString()
+    description: string | null;
+
+    @Transform(({ value }) => +value)
+    @IsOptional()
     @IsNumber()
     amount: number;
-
-    @IsString()
-    categoryId: string;
-
-    @IsOptional()
-    @IsString()
-    imageUrl: string | null;
 }
