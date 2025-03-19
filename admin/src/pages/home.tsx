@@ -46,6 +46,7 @@ export default function DashboardPage() {
         await fetcher('auth/admin/logout');
         localStorage.removeItem('accessToken');
         localStorage.removeItem('user');
+        router('/auth');
     };
 
     return (
@@ -64,7 +65,7 @@ export default function DashboardPage() {
                         sx={{
                             fontWeight: 600,
                         }}>
-                        {user.email}
+                        {user ? user.email : null}
                     </Typography>
                     <Button onClick={onLogoutHandler}>Logout</Button>
                 </Stack>
