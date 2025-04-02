@@ -4,7 +4,7 @@ FROM node:20-bullseye AS builder
 WORKDIR /app
 
 # Копируем package.json и устанавливаем зависимости
-COPY package*.json
+COPY package*.json ./
 
 # Устанавливаем зависимости
 RUN npm install
