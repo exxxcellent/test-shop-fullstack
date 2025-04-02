@@ -26,7 +26,7 @@ WORKDIR /app
 # Копируем собранные файлы и зависимости
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package*.json ./
+COPY package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
 #RUN npm install -g prisma
