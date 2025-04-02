@@ -13,7 +13,7 @@ RUN npm install
 COPY . .
 
 # Генерация prisma client для backend`а
-RUN npm prisma generate
+RUN npx prisma generate
 
 # Собираем NestJS (если есть TypeScript)
 RUN npm run build
