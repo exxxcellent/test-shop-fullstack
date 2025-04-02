@@ -4,13 +4,16 @@ FROM node:20-bullseye AS builder
 WORKDIR /app
 
 # Копируем package.json и устанавливаем зависимости
-COPY package.json package-lock.json ./
+COPY package*.json
 
 # Устанавливаем зависимости
 RUN npm install
 
 # Копируем исходный код
 COPY . .
+
+# Генерация prisma client для backend`а
+RUN npm prisma generate
 
 # Собираем NestJS (если есть TypeScript)
 RUN npm run build
@@ -23,10 +26,10 @@ WORKDIR /app
 # Копируем собранные файлы и зависимости
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
-RUN npm install -g prisma
+#RUN npm install -g prisma
 
 EXPOSE 3000
 
