@@ -1,7 +1,7 @@
 # test-shop-fullstack
 
 ## Заполнение .env файла
-```
+```env
 # app config
 API_PORT=3000
 CLIENT_PORT=8080
