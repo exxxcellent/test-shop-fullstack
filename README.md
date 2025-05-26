@@ -1,1 +1,31 @@
 # test-shop-fullstack
+
+## Заполнение .env файла
+```
+# app config
+API_PORT=3000
+CLIENT_PORT=8080
+ADMIN_PORT=4000
+HOST="http://localhost:${API_PORT}"
+CLIENT_HOST="http://localhost:${CLIENT_PORT}"
+# db config
+POSTGRES_USER=postgres
+POSTGRES_PWD=123456
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=YOUR_DB
+DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PWD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"
+
+# JWT secret
+JWT_ACCESS_SECRET=YOUR_SECRET
+JWT_REFRESH_SECRET=YOUR_SECRET
+
+# mailer
+MAIL_HOST="YOUR_SMTP"
+MAIL_PORT=YOUR_PORT
+MAIL_USER=YOUR_EMAIL
+MAIL_PWD=YOUR_APP_PASSWORD
+
+# client
+VITE_API_URL="http://localhost:${API_PORT}"
+```
